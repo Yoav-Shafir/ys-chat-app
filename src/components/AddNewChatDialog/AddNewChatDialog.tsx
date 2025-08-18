@@ -10,11 +10,17 @@ import {
 
 interface AddChatDialogProps {
   open: boolean;
+  loading: boolean;
   onClose: () => void;
   onAdd: (name: string) => void;
 }
 
-const AddNewChatDialog = ({ open, onClose, onAdd }: AddChatDialogProps) => {
+const AddNewChatDialog = ({
+  open,
+  loading,
+  onClose,
+  onAdd,
+}: AddChatDialogProps) => {
   const [name, setName] = useState('');
 
   const handleAdd = () => {
@@ -26,12 +32,12 @@ const AddNewChatDialog = ({ open, onClose, onAdd }: AddChatDialogProps) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>New Chat</DialogTitle>
+      <DialogTitle>New Group Chat</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin='dense'
-          label='User name'
+          label='Group name'
           type='text'
           fullWidth
           value={name}
@@ -41,6 +47,8 @@ const AddNewChatDialog = ({ open, onClose, onAdd }: AddChatDialogProps) => {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button
+          loading={loading}
+          loadingPosition='end'
           disabled={!name}
           variant='contained'
           sx={{
@@ -51,7 +59,7 @@ const AddNewChatDialog = ({ open, onClose, onAdd }: AddChatDialogProps) => {
             onClose();
           }}
         >
-          Add
+          Create
         </Button>
       </DialogActions>
     </Dialog>

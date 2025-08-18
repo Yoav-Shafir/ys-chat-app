@@ -7,6 +7,9 @@ import Button from '@mui/material/Button';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { useRef, useState } from 'react';
 import { useChat } from '../../context/ChatContext';
+import { useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
+import { useAuth } from '../../context/AuthContext';
 
 interface EmojiMartEmoji {
   id: string;
@@ -18,31 +21,34 @@ interface EmojiMartEmoji {
 }
 
 const ChatInput = () => {
-  const { sendMessage, currentChatId } = useChat();
+  const { currentGroupSelect } = useChat();
+  const { currentUser } = useAuth();
+  const sendMessage = useMutation(api.functions.messages.sendMessage);
   const [message, setMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !currentChatId) return;
-
-    const fileUrl = URL.createObjectURL(file);
-    sendMessage(message, {
-      name: file.name,
-      type: file.type,
-      url: fileUrl,
-    });
-    setMessage('');
+  const handleFileSelect = () => {
+    // Logic select file and send message
   };
 
-  const handleSend = () => {
-    if (
-      (message.trim() || fileInputRef.current?.files?.length) &&
-      currentChatId
-    ) {
-      sendMessage(message);
+  const handleSend = async () => {
+    try {
+      if (!currentGroupSelect || !message.trim()) return;
+      setLoading(true);
+      await sendMessage({
+        groupId: currentGroupSelect,
+        senderId: currentUser?._id,
+        text: message?.trim(),
+      });
+
       setMessage('');
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,7 +98,9 @@ const ChatInput = () => {
       </Box>
 
       <Button
-        disabled={!currentChatId}
+        disabled={!currentGroupSelect}
+        loading={loading}
+        loadingPosition='end'
         variant='contained'
         sx={{ height: '40px', width: '100px', color: '#fff' }}
         onClick={handleSend}

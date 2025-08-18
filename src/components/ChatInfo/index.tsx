@@ -2,10 +2,16 @@ import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useChat } from '../../context/ChatContext';
+import { useQuery } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 
 const ChatInfo = () => {
-  const { currentChatId, chatList } = useChat();
-  const currentChat = chatList.find((chat) => chat.id === currentChatId);
+  const { currentGroupSelect } = useChat();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentChat: any = useQuery(
+    api.functions.groups.getGroupByKey,
+    currentGroupSelect ? { groupId: currentGroupSelect } : 'skip'
+  );
 
   return (
     <Box
@@ -19,12 +25,12 @@ const ChatInfo = () => {
       {currentChat ? (
         <>
           <Avatar
-            src={currentChat.avatar}
-            alt={currentChat.name}
+            src={currentChat?.avatar}
+            alt={currentChat?.name}
             sx={{ width: 32, height: 32, mr: 2 }}
           />
           <Typography variant='subtitle1' fontWeight={500}>
-            {currentChat.name}
+            {currentChat?.name}
           </Typography>
         </>
       ) : (

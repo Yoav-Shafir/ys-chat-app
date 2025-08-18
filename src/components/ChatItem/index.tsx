@@ -1,12 +1,15 @@
-import { Box, Typography, IconButton } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Box, IconButton, Typography } from '@mui/material';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface ChatItemProps {
-  id: string;
+  id: Id<'groups'>;
   name: string;
   isActive: boolean;
-  onSelect: (id: string) => void;
+  onSelect: (id: Id<'groups'>) => void;
   onDelete: (id: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  userProfile: any;
 }
 
 const ChatItem = ({
@@ -15,6 +18,7 @@ const ChatItem = ({
   isActive,
   onSelect,
   onDelete,
+  userProfile,
 }: ChatItemProps) => {
   return (
     <Box
@@ -31,20 +35,22 @@ const ChatItem = ({
       }}
       onClick={() => onSelect(id)}
     >
-      <Typography variant='body2' sx={{ flex: 1 }}>
+      <Typography variant='body2' display={'flex'} sx={{ flex: 1 }}>
         {name}
       </Typography>
-      <IconButton
-        className='delete-btn'
-        size='small'
-        sx={{ opacity: 0, transition: 'opacity 0.2s' }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(id);
-        }}
-      >
-        <DeleteOutlineIcon fontSize='small' />
-      </IconButton>
+      {userProfile?.role === 'admin' && (
+        <IconButton
+          className='delete-btn'
+          size='small'
+          sx={{ opacity: 0, transition: 'opacity 0.2s' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(id);
+          }}
+        >
+          <DeleteOutlineIcon fontSize='small' />
+        </IconButton>
+      )}
     </Box>
   );
 };
